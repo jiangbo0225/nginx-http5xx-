@@ -206,7 +206,7 @@ domain=$(wget  -q 127.0.0.1:60913/rc -O - 2> /dev/null | awk -F',' '{print $1"/"
 
 
 #获取http_5xx
-#wget -q http://127.0.0.1:60913/rc -O - 2> /dev/null | grep "mts.benmu-health.com,10.32.132.115:80" | cut -f10 -d','
+#wget -q http://127.0.0.1:60913/rc -O - 2> /dev/null | grep "xxxx.com,10.32.33.22:80" | cut -f10 -d','
 
 #save the nginx stats in a variable for future parsing
 NGINX_STATS=$(wget  -q 127.0.0.1:60913/rc -O - 2> /dev/null)
