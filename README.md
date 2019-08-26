@@ -49,6 +49,7 @@ server {
 }
 
 ---------------------------------------------------------------
+
 root@local:~# cat /etc/zabbix/scripts/discovery/domain_discovery.sh
 #!/bin/bash
 
@@ -72,43 +73,42 @@ root@wlocal:~#
 root@local:~# cat /etc/zabbix/scripts/nginx/nginx.sh
 #!/bin/bash
 
-# Zabbix requested parameter
+#Zabbix requested parameter
 ZBX_REQ_DATA="$1"
 ZBX_REQ_DATA_URL="$2"
 
-# Nginx defaults
+#Nginx defaults
 NGINX_STATUS_DEFAULT_URL="http://127.0.0.1:60913/nginx_status"
 WGET_BIN="/usr/bin/wget"
 
 #
-# Error handling:
-# - need to be displayable in Zabbix (avoid NOT_SUPPORTED)
-# - items need to be of type "float" (allow negative + float)
-#
+#Error handling:
+#- need to be displayable in Zabbix (avoid NOT_SUPPORTED)
+#- items need to be of type "float" (allow negative + float)
+
 ERROR_NO_ACCESS_FILE="-0.9900"
 ERROR_NO_ACCESS="-0.9901"
 ERROR_WRONG_PARAM="-0.9902"
 ERROR_DATA="-0.9903" # either can not connect / bad host / bad port
 
-# Handle host and port if non-default
+#Handle host and port if non-default
 if [ ! -z "$ZBX_REQ_DATA_URL" ]; then
 URL="$ZBX_REQ_DATA_URL"
 else
 URL="$NGINX_STATUS_DEFAULT_URL"
 fi
 
-# save the nginx stats in a variable for future parsing
+#save the nginx stats in a variable for future parsing
 NGINX_STATS=$($WGET_BIN -q $URL -O - 2> /dev/null)
 
-# error during retrieve
+#error during retrieve
 if [ $? -ne 0 -o -z "$NGINX_STATS" ]; then
 echo $ERROR_DATA
   exit 1
 fi
 
-#
-# Extract data from nginx stats
-#
+
+#Extract data from nginx stats
 case $ZBX_REQ_DATA in
   active_connections) echo "$NGINX_STATS" | head -1 | cut -f3 -d' ';;
   accepted_connections) echo "$NGINX_STATS" | grep -Ev '[a-zA-Z]' | cut -f2 -d' ';;
@@ -125,12 +125,12 @@ exit 0
 root@local:~# cat /etc/zabbix/scripts/nginx/rc.sh
 #!/bin/bash
 
-# UserParameter=rc[*],/etc/zabbix/scripts/nginx/rc.sh "$1" "$2" "$3"
+#UserParameter=rc[*],/etc/zabbix/scripts/nginx/rc.sh "$1" "$2" "$3"
 
-# Zabbix requested parameter
-# item
+#Zabbix requested parameter
+#item
 ZBX_REQ_DATA="$1"
-# domain
+#domain
 ZBX_REQ_DOMAIN=$(echo $2 | tr "/" ",")
 
 ZBX_REQ_DATA_URL="$3"
@@ -139,27 +139,25 @@ ZBX_REQ_DATA_URL="$3"
 NGINX_STATUS_DEFAULT_URL="http://127.0.0.1:60913/rc"
 WGET_BIN="/usr/bin/wget"
 
-#
-# Error handling:
-# - need to be displayable in Zabbix (avoid NOT_SUPPORTED)
-# - items need to be of type "float" (allow negative + float)
-#
+#Error handling:
+#- need to be displayable in Zabbix (avoid NOT_SUPPORTED)
+#- items need to be of type "float" (allow negative + float)
 ERROR_NO_ACCESS_FILE="-0.9900"
 ERROR_NO_ACCESS="-0.9901"
 ERROR_WRONG_PARAM="-0.9902"
 ERROR_DATA="-0.9903" # either can not connect / bad host / bad port
 
-# Handle host and port if non-default
+#Handle host and port if non-default
 if [ ! -z "$ZBX_REQ_DATA_URL" ]; then
 URL="$ZBX_REQ_DATA_URL"
 else
 URL="$NGINX_STATUS_DEFAULT_URL"
 fi
 
-# save the nginx stats in a variable for future parsing
+#save the nginx stats in a variable for future parsing
 NGINX_STATS=$($WGET_BIN -q $URL -O - 2> /dev/null)
 
-# error during retrieve
+#error during retrieve
 if [ $? -ne 0 -o -z "$NGINX_STATS" ]; then
 echo $ERROR_DATA
   exit 1
@@ -210,9 +208,9 @@ domain=$(wget  -q 127.0.0.1:60913/rc -O - 2> /dev/null | awk -F',' '{print $1"/"
 #获取http_5xx
 #wget -q http://127.0.0.1:60913/rc -O - 2> /dev/null | grep "mts.benmu-health.com,10.32.132.115:80" | cut -f10 -d','
 
-# save the nginx stats in a variable for future parsing
+#save the nginx stats in a variable for future parsing
 NGINX_STATS=$(wget  -q 127.0.0.1:60913/rc -O - 2> /dev/null)
-# error during retrieve
+#error during retrieve
 if [ $? -ne 0 ]; then
 curl --connect-timeout 20 -X POST -d "[{\"metric\": \"nginx_status\", \"endpoint\": \"$HOSTNAME\", \"timestamp\": $ts,\"step\": 60,\"value\": 0,\"counterType\": \"GAUGE\",\"tags\": \"\"}]" http://127.0.0.1:1988/v1/push
 else
