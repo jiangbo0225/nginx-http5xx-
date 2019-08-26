@@ -135,7 +135,7 @@ ZBX_REQ_DOMAIN=$(echo $2 | tr "/" ",")
 
 ZBX_REQ_DATA_URL="$3"
 
-# Nginx defaults
+#Nginx defaults
 NGINX_STATUS_DEFAULT_URL="http://127.0.0.1:60913/rc"
 WGET_BIN="/usr/bin/wget"
 
